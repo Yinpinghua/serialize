@@ -74,7 +74,7 @@ DEF_BASIC_TYPE_SERIALIZE_AND_DESERIALIZE(double)
 template<>
 std::string serialize(std::string& s)
 {
-	int len = static_cast<int>(s.size());
+	unsigned int len = static_cast<int>(s.size());
 	std::string ret;
 	ret.append(::serialize(len));
 	ret.append(s.data(), len);
@@ -84,7 +84,7 @@ std::string serialize(std::string& s)
 template<>
 int deserialize(std::string& str, std::string& s)
 {
-	int len;
+	unsigned int len;
 	::deserialize(str, len);
 	s = str.substr(sizeof(len), len);
 	return sizeof(int) + len;
@@ -114,11 +114,12 @@ public:
 	template<typename BasicType>
 	out_stream& operator<< (std::vector<BasicType>& a)
 	{
-		int len = a.size();
+		unsigned int len = static_cast<unsigned int>(a.size());
+
 		std::string x = ::serialize(len);
 		os.write(x.data(), x.size());
 
-		for (int i = 0; i < len; ++i)
+		for (unsigned int i = 0; i < len; ++i)
 		{
 			std::string item = ::serialize(a[i]);
 			os.write(item.data(), item.size());
@@ -157,8 +158,8 @@ public:
 		std::vector<BasicTypeA> tempKey;
 		std::vector<BasicTypeB> tempVal;
 
-		typename std::map<BasicTypeA, BasicTypeB>::const_iterator it;
-		for (it = a.begin();it != a.end();++it)
+		typename std::map<BasicTypeA, BasicTypeB>::const_iterator it = a.begin();
+		for (;it != a.end();++it)
 		{
 			tempKey.push_back(it->first);
 			tempVal.push_back(it->second);
@@ -174,8 +175,8 @@ public:
 		std::vector<BasicTypeA> tempKey;
 		std::vector<BasicTypeB> tempVal;
 
-		typename std::unordered_map<BasicTypeA, BasicTypeB>::const_iterator it;
-		for (it = a.begin();it != a.end();++it)
+		typename std::unordered_map<BasicTypeA, BasicTypeB>::const_iterator it = a.begin();
+		for (;it != a.end();++it)
 		{
 			tempKey.push_back(it->first);
 			tempVal.push_back(it->second);
@@ -213,11 +214,11 @@ public:
 	template<typename BasicType>
 	in_stream& operator>> (std::vector<BasicType>& a)
 	{
-		int len = 0;
+		unsigned int len = 0;
 		int ret = ::deserialize(str, len);
 		str = str.substr(ret);
 
-		for (int i = 0; i < len; ++i)
+		for (unsigned int i = 0; i < len; ++i)
 		{
 			BasicType item;
 			int size = ::deserialize(str, item);
