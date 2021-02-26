@@ -74,7 +74,7 @@ DEF_BASIC_TYPE_SERIALIZE_AND_DESERIALIZE(double)
 template<>
 std::string serialize(std::string& s)
 {
-	unsigned int len = static_cast<int>(s.size());
+	unsigned int len = static_cast<unsigned int>(s.size());
 	std::string ret;
 	ret.append(::serialize(len));
 	ret.append(s.data(), len);
