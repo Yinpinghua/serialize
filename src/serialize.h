@@ -95,16 +95,16 @@ int deserialize(std::string& str, std::string& s)
 //for serialize data struct
 ////////////////////////////////////////////
 
-class OutStream
+class out_stream
 {
 public:
 
-	OutStream() : os(std::ios::binary)
+	out_stream() : os(std::ios::binary)
 	{
 	}
 
 	template<typename SerializableType>
-	OutStream& operator<< (SerializableType& a)
+	out_stream& operator<< (SerializableType& a)
 	{
 		std::string x = ::serialize(a);
 		os.write(x.data(), x.size());
@@ -112,7 +112,7 @@ public:
 	}
 
 	template<typename BasicType>
-	OutStream& operator<< (std::vector<BasicType>& a)
+	out_stream& operator<< (std::vector<BasicType>& a)
 	{
 		int len = a.size();
 		std::string x = ::serialize(len);
@@ -128,7 +128,7 @@ public:
 	}
 
 	template<typename BasicType>
-	OutStream& operator<< (std::list<BasicType>& a)
+	out_stream& operator<< (std::list<BasicType>& a)
 	{
 		std::vector<BasicType> temp;
 		std::copy(a.begin(), a.end(), std::back_inserter(temp));
@@ -136,7 +136,7 @@ public:
 	}
 
 	template<typename BasicType>
-	OutStream& operator<< (std::set<BasicType>& a)
+	out_stream& operator<< (std::set<BasicType>& a)
 	{
 		std::vector<BasicType> temp;
 		std::copy(a.begin(), a.end(), std::back_inserter(temp));
@@ -144,7 +144,7 @@ public:
 	}
 
 	template<typename BasicType>
-	OutStream& operator<< (std::unordered_set<BasicType>& a)
+	out_stream& operator<< (std::unordered_set<BasicType>& a)
 	{
 		std::vector<BasicType> temp;
 		std::copy(a.begin(), a.end(), std::back_inserter(temp));
@@ -152,7 +152,7 @@ public:
 	}
 
 	template<typename BasicTypeA, typename BasicTypeB>
-	OutStream& operator<< (std::map<BasicTypeA, BasicTypeB>& a)
+	out_stream& operator<< (std::map<BasicTypeA, BasicTypeB>& a)
 	{
 		std::vector<BasicTypeA> tempKey;
 		std::vector<BasicTypeB> tempVal;
@@ -169,7 +169,7 @@ public:
 	}
 
 	template<typename BasicTypeA, typename BasicTypeB>
-	OutStream& operator<< (std::unordered_map<BasicTypeA, BasicTypeB>& a)
+	out_stream& operator<< (std::unordered_map<BasicTypeA, BasicTypeB>& a)
 	{
 		std::vector<BasicTypeA> tempKey;
 		std::vector<BasicTypeB> tempVal;
@@ -194,16 +194,16 @@ public:
 	std::ostringstream os;
 };
 
-class InStream
+class in_stream
 {
 public:
 
-	InStream(const std::string& s) : str(s), total(s.size())
+	in_stream(const std::string& s) : str(s), total(s.size())
 	{
 	}
 
 	template<typename SerializableType>
-	InStream& operator>> (SerializableType& a)
+	in_stream& operator>> (SerializableType& a)
 	{
 		int ret = ::deserialize(str, a);
 		str = str.substr(ret);
@@ -211,7 +211,7 @@ public:
 	}
 
 	template<typename BasicType>
-	InStream& operator>> (std::vector<BasicType>& a)
+	in_stream& operator>> (std::vector<BasicType>& a)
 	{
 		int len = 0;
 		int ret = ::deserialize(str, len);
@@ -229,10 +229,10 @@ public:
 	}
 
 	template<typename BasicType>
-	InStream& operator>> (std::list<BasicType>& a)
+	in_stream& operator>> (std::list<BasicType>& a)
 	{
 		std::vector<BasicType> temp;
-		InStream& ret = this->operator>> (temp);
+		in_stream& ret = this->operator>> (temp);
 		if (temp.size() > 0)
 		{
 			std::copy(temp.begin(), temp.end(), std::back_inserter(a));
@@ -242,10 +242,10 @@ public:
 	}
 
 	template<typename BasicType>
-	InStream& operator>> (std::set<BasicType>& a)
+	in_stream& operator>> (std::set<BasicType>& a)
 	{
 		std::vector<BasicType> temp;
-		InStream& ret = this->operator>> (temp);
+		in_stream& ret = this->operator>> (temp);
 		if (temp.size() > 0)
 		{
 			for (size_t i = 0; i < temp.size(); ++i)
@@ -258,10 +258,10 @@ public:
 	}
 
 	template<typename BasicType>
-	InStream& operator>> (std::unordered_set<BasicType>& a)
+	in_stream& operator>> (std::unordered_set<BasicType>& a)
 	{
 		std::vector<BasicType> temp;
-		InStream& ret = this->operator>> (temp);
+		in_stream& ret = this->operator>> (temp);
 		if (temp.size() > 0)
 		{
 			for (size_t i = 0; i < temp.size(); ++i)
@@ -274,13 +274,13 @@ public:
 	}
 
 	template<typename BasicTypeA, typename BasicTypeB>
-	InStream& operator>> (std::map<BasicTypeA, BasicTypeB>& a)
+	in_stream& operator>> (std::map<BasicTypeA, BasicTypeB>& a)
 	{
 		std::vector<BasicTypeA> tempKey;
 		std::vector<BasicTypeB> tempVal;
 
 		this->operator>> (tempKey);
-		InStream& ret = this->operator>> (tempVal);
+		in_stream& ret = this->operator>> (tempVal);
 
 		if (tempKey.size() > 0 && tempVal.size() == tempKey.size())
 		{
@@ -294,19 +294,20 @@ public:
 	}
 
 	template<typename BasicTypeA, typename BasicTypeB>
-	InStream& operator>> (std::unordered_map<BasicTypeA, BasicTypeB>& a)
+	in_stream& operator>> (std::unordered_map<BasicTypeA, BasicTypeB>& a)
 	{
 		std::vector<BasicTypeA> tempKey;
 		std::vector<BasicTypeB> tempVal;
 
 		this->operator>> (tempKey);
-		InStream& ret = this->operator>> (tempVal);
+		in_stream& ret = this->operator>> (tempVal);
 
 		if (tempKey.size() > 0 && tempVal.size() == tempKey.size())
 		{
 			for (size_t i = 0; i < tempKey.size(); ++i)
 			{
-				a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));
+				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));
+				a.emplace(tempKey[i], tempVal[i]);
 			}
 		}
 
