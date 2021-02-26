@@ -42,3 +42,4 @@
 ## 四、参考文献
 
  参考：http://blog.csdn.net/Kiritow/article/details/53129096
+## 五、char* char[]类型的数据,直接copy
