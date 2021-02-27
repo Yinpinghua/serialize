@@ -16,13 +16,13 @@
 ////////////////////////////////////////////////////
 
 //虚函数调用
-template<typename SerializableType>
+template<typename SerializableType =Serializable>
 std::string serialize(SerializableType& a)
 {
 	return a.serialize();
 }
 
-template<typename SerializableType>
+template<typename SerializableType=Serializable>
 int deserialize(std::string& str, SerializableType& a)
 {
 	return a.deserialize(str);
