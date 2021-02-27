@@ -15,6 +15,7 @@
 // define normal template function
 ////////////////////////////////////////////////////
 
+//虚函数调用
 template<typename SerializableType>
 std::string serialize(SerializableType& a)
 {
