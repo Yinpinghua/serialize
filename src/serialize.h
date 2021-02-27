@@ -21,7 +21,7 @@ class Serializable
 {
 public:
 	virtual std::string serialize() = 0;
-	virtual int deserialize(const std::string&) = 0;
+	virtual unsigned int deserialize(const std::string&) = 0;
 };
 
 ////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ std::string serialize(SerializableType& a)
 }
 
 template<typename SerializableType = Serializable>
-int deserialize(std::string& str, SerializableType& a)
+unsigned int deserialize(std::string& str, SerializableType& a)
 {
 	return a.deserialize(str);
 }
@@ -57,7 +57,7 @@ std::string serialize(Type& b) \
 
 #define DEF_BASIC_TYPE_DESERIALIZE(Type)  \
  template<> \
-int deserialize(std::string& str,Type& b)\
+unsigned int deserialize(std::string& str,Type& b)\
 { \
         memcpy(&b,str.data(),sizeof(Type)); \
         return sizeof(Type); \
@@ -96,7 +96,7 @@ std::string serialize(std::string& s)
 }
 
 template<>
-int deserialize(std::string& str, std::string& s)
+unsigned int deserialize(std::string& str, std::string& s)
 {
 	unsigned int len;
 	::deserialize(str, len);
@@ -329,9 +329,9 @@ public:
 		return ret;
 	}
 
-	int size()
+	unsigned int size()
 	{
-		return static_cast<int>(total - str.size());
+		return static_cast<unsigned int>(total - str.size());
 	}
 
 protected:
