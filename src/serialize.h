@@ -11,18 +11,31 @@
 #include <unordered_map>
 #include <unordered_set>
 
+////////////////////////////////////////////
+//Serialize for custom class object
+//If your class object want to be serialized,
+//Plese derive for this base class
+///////////////////////////////////////////
+
+class Serializable
+{
+public:
+	virtual std::string serialize() = 0;
+	virtual int deserialize(const std::string&) = 0;
+};
+
 ////////////////////////////////////////////////////
 // define normal template function
 ////////////////////////////////////////////////////
 
 //虚函数调用
-template<typename SerializableType =Serializable>
+template<typename SerializableType = Serializable>
 std::string serialize(SerializableType& a)
 {
 	return a.serialize();
 }
 
-template<typename SerializableType=Serializable>
+template<typename SerializableType = Serializable>
 int deserialize(std::string& str, SerializableType& a)
 {
 	return a.deserialize(str);
@@ -324,19 +337,6 @@ public:
 protected:
 	std::string str;
 	size_t total;
-};
-
-////////////////////////////////////////////
-//Serialize for custom class object
-//If your class object want to be serialized,
-//Plese derive for this base class
-///////////////////////////////////////////
-
-class Serializable
-{
-public:
-	virtual std::string serialize() = 0;
-	virtual int deserialize(const std::string&) = 0;
 };
 
 ///////////////////////////////////////////
