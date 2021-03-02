@@ -7,7 +7,7 @@
 #include <map>     //std::map
 #include <utility>    // std::pair
 #include <iterator>  //std::back_inserter
-#include <string.h>  //memcpy
+#include <string>  //memcpy
 #include <unordered_map>
 #include <unordered_set>
 
