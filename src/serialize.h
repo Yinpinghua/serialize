@@ -7,9 +7,10 @@
 #include <map>     //std::map
 #include <utility>    // std::pair
 #include <iterator>  //std::back_inserter
-#include <string>  //memcpy
+#include <string.h>  //memcpy
 #include <unordered_map>
 #include <unordered_set>
+#include <deque>
 
 ////////////////////////////////////////////
 //Serialize for custom class object
@@ -30,13 +31,13 @@ public:
 
 //虚函数调用
 template<typename SerializableType = Serializable>
-std::string serialize(SerializableType& a)
+static std::string serialize(SerializableType& a)
 {
 	return a.serialize();
 }
 
 template<typename SerializableType = Serializable>
-unsigned int deserialize(std::string& str, SerializableType& a)
+static unsigned int deserialize(std::string& str, SerializableType& a)
 {
 	return a.deserialize(str);
 }
@@ -48,7 +49,7 @@ unsigned int deserialize(std::string& str, SerializableType& a)
 /////////////////////////////////////////////////
 #define DEF_BASIC_TYPE_SERIALIZE(Type) \
  template<> \
-std::string serialize(Type& b) \
+static std::string serialize(Type& b) \
 { \
         std::string ret; \
         ret.append((const char*)&b,sizeof(Type)); \
@@ -57,7 +58,7 @@ std::string serialize(Type& b) \
 
 #define DEF_BASIC_TYPE_DESERIALIZE(Type)  \
  template<> \
-unsigned int deserialize(std::string& str,Type& b)\
+static unsigned int deserialize(std::string& str,Type& b)\
 { \
         memcpy(&b,str.data(),sizeof(Type)); \
         return sizeof(Type); \
@@ -86,7 +87,7 @@ DEF_BASIC_TYPE_SERIALIZE_AND_DESERIALIZE(double)
 
 // for c++ type std::string
 template<>
-std::string serialize(std::string& s)
+static std::string serialize(std::string& s)
 {
 	unsigned int len = static_cast<unsigned int>(s.size());
 	std::string ret;
@@ -96,7 +97,7 @@ std::string serialize(std::string& s)
 }
 
 template<>
-unsigned int deserialize(std::string& str, std::string& s)
+static unsigned int deserialize(std::string& str, std::string& s)
 {
 	unsigned int len;
 	::deserialize(str, len);
@@ -144,6 +145,14 @@ public:
 
 	template<typename BasicType>
 	out_stream& operator<< (std::list<BasicType>& a)
+	{
+		std::vector<BasicType> temp;
+		std::copy(a.begin(), a.end(), std::back_inserter(temp));
+		return this->operator<< (temp);
+	}
+
+	template<typename BasicType>
+	out_stream& operator<< (std::deque<BasicType>& a)
 	{
 		std::vector<BasicType> temp;
 		std::copy(a.begin(), a.end(), std::back_inserter(temp));
@@ -245,6 +254,19 @@ public:
 
 	template<typename BasicType>
 	in_stream& operator>> (std::list<BasicType>& a)
+	{
+		std::vector<BasicType> temp;
+		in_stream& ret = this->operator>> (temp);
+		if (temp.size() > 0)
+		{
+			std::copy(temp.begin(), temp.end(), std::back_inserter(a));
+		}
+
+		return ret;
+	}
+
+	template<typename BasicType>
+	in_stream& operator>> (std::deque<BasicType>& a)
 	{
 		std::vector<BasicType> temp;
 		in_stream& ret = this->operator>> (temp);
