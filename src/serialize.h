@@ -211,7 +211,7 @@ public:
 
 	std::string str()
 	{
-		return os.str();
+		return std::move(os.str());
 	}
 
 public:
