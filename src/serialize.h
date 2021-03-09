@@ -8,6 +8,7 @@
 #include <utility>    // std::pair
 #include <iterator>  //std::back_inserter
 #include <string.h>  //memcpy
+#include <forward_list>
 #include <unordered_map>
 #include <unordered_set>
 #include <deque>
@@ -150,6 +151,15 @@ public:
 		return this->operator<< (temp);
 	}
 
+	//c++11单链表
+	template<typename BasicType>
+	out_stream& operator<< (std::forward_list<BasicType>& a)
+	{
+		std::vector<BasicType> temp;
+		std::copy(a.begin(), a.end(), std::back_inserter(temp));
+		return this->operator<< (temp);
+	}
+
 	template<typename BasicType>
 	out_stream& operator<< (std::deque<BasicType>& a)
 	{
@@ -264,6 +274,18 @@ public:
 		return ret;
 	}
 
+	//c++11单链表
+	template<typename BasicType>
+	in_stream& operator>> (std::forward_list<BasicType>& a)
+	{
+		std::vector<BasicType> temp;
+		in_stream& ret = this->operator>> (temp);
+		if (temp.size() > 0)
+		{
+			std::copy(temp.begin(), temp.end(), std::back_inserter(a));
+		}
+	}
+
 	template<typename BasicType>
 	in_stream& operator>> (std::deque<BasicType>& a)
 	{
@@ -294,7 +316,7 @@ public:
 	{
 		std::vector<BasicType> temp;
 		in_stream& ret = this->operator>> (temp);
-		for (const auto& info : temp) {
+		for (const auto &info:temp){
 			a.emplace(info);
 		}
 
@@ -310,9 +332,9 @@ public:
 		this->operator>> (tempKey);
 		in_stream& ret = this->operator>> (tempVal);
 
-		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()) {
+		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()){
 			size_t key_size = tempKey.size();
-			for (size_t i = 0; i < key_size; ++i) {
+			for (size_t i = 0; i < key_size; ++i){
 				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));效率低
 				a.emplace(tempKey[i], tempVal[i]);
 			}
@@ -330,9 +352,9 @@ public:
 		this->operator>> (tempKey);
 		in_stream& ret = this->operator>> (tempVal);
 
-		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()) {
+		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()){
 			size_t key_size = tempKey.size();
-			for (size_t i = 0; i < key_size; ++i) {
+			for (size_t i = 0; i < key_size; ++i){
 				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));//会报错
 				a.emplace(tempKey[i], tempVal[i]);
 			}
