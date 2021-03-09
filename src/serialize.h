@@ -113,8 +113,7 @@ static unsigned int deserialize(std::string& str, std::string& s)
 class out_stream
 {
 public:
-
-	out_stream() : os(std::ios::binary)
+	out_stream() : os_(std::ios::binary)
 	{
 	}
 
@@ -122,7 +121,7 @@ public:
 	out_stream& operator<< (SerializableType& a)
 	{
 		std::string x = ::serialize(a);
-		os.write(x.data(), x.size());
+		os_.write(x.data(), x.size());
 		return *this;
 	}
 
@@ -132,12 +131,12 @@ public:
 		unsigned int len = static_cast<unsigned int>(a.size());
 
 		std::string x = ::serialize(len);
-		os.write(x.data(), x.size());
+		os_.write(x.data(), x.size());
 
 		for (unsigned int i = 0; i < len; ++i)
 		{
 			std::string item = ::serialize(a[i]);
-			os.write(item.data(), item.size());
+			os_.write(item.data(), item.size());
 		}
 
 		return *this;
@@ -211,26 +210,26 @@ public:
 
 	std::string str()
 	{
-		return std::move(os.str());
+		return std::move(os_.str());
 	}
 
 public:
-	std::ostringstream os;
+	std::ostringstream os_;
 };
 
 class in_stream
 {
 public:
 
-	in_stream(const std::string& s) : str(s), total(s.size())
+	in_stream(const std::string& s) : str_(s), total_(s.size())
 	{
 	}
 
 	template<typename SerializableType>
 	in_stream& operator>> (SerializableType& a)
 	{
-		int ret = ::deserialize(str, a);
-		str = str.substr(ret);
+		int ret = ::deserialize(str_, a);
+		str_ = str_.substr(ret);
 		return *this;
 	}
 
@@ -238,14 +237,14 @@ public:
 	in_stream& operator>> (std::vector<BasicType>& a)
 	{
 		unsigned int len = 0;
-		int ret = ::deserialize(str, len);
-		str = str.substr(ret);
+		int ret = ::deserialize(str_, len);
+		str_ = str_.substr(ret);
 
 		for (unsigned int i = 0; i < len; ++i)
 		{
 			BasicType item;
-			int size = ::deserialize(str, item);
-			str = str.substr(size);
+			int size = ::deserialize(str_, item);
+			str_ = str_.substr(size);
 			a.push_back(item);
 		}
 
@@ -283,12 +282,8 @@ public:
 	{
 		std::vector<BasicType> temp;
 		in_stream& ret = this->operator>> (temp);
-		if (temp.size() > 0)
-		{
-			for (size_t i = 0; i < temp.size(); ++i)
-			{
-				a.insert(temp[i]);
-			}
+		for (const auto& info : temp) {
+			a.emplace(info);
 		}
 
 		return ret;
@@ -299,12 +294,8 @@ public:
 	{
 		std::vector<BasicType> temp;
 		in_stream& ret = this->operator>> (temp);
-		if (temp.size() > 0)
-		{
-			for (size_t i = 0; i < temp.size(); ++i)
-			{
-				a.insert(temp[i]);
-			}
+		for (const auto &info:temp){
+			a.emplace(info);
 		}
 
 		return ret;
@@ -319,10 +310,9 @@ public:
 		this->operator>> (tempKey);
 		in_stream& ret = this->operator>> (tempVal);
 
-		if (tempKey.size() > 0 && tempVal.size() == tempKey.size())
-		{
-			for (size_t i = 0; i < tempKey.size(); ++i)
-			{
+		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()){
+			size_t key_size = tempKey.size();
+			for (size_t i = 0; i < key_size; ++i){
 				a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));
 			}
 		}
@@ -339,10 +329,9 @@ public:
 		this->operator>> (tempKey);
 		in_stream& ret = this->operator>> (tempVal);
 
-		if (tempKey.size() > 0 && tempVal.size() == tempKey.size())
-		{
-			for (size_t i = 0; i < tempKey.size(); ++i)
-			{
+		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()){
+			size_t key_size = tempKey.size();
+			for (size_t i = 0; i < key_size; ++i){
 				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));
 				a.emplace(tempKey[i], tempVal[i]);
 			}
@@ -353,12 +342,12 @@ public:
 
 	unsigned int size()
 	{
-		return static_cast<unsigned int>(total - str.size());
+		return static_cast<unsigned int>(total_ - str_.size());
 	}
 
 protected:
-	std::string str;
-	size_t total;
+	std::string str_;
+	size_t total_;
 };
 
 ///////////////////////////////////////////
