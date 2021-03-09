@@ -87,7 +87,7 @@ DEF_BASIC_TYPE_SERIALIZE_AND_DESERIALIZE(double)
 
 // for c++ type std::string
 template<>
-static std::string serialize(const std::string& s)
+static std::string serialize(std::string& s)
 {
 	unsigned int len = static_cast<unsigned int>(s.size());
 	std::string ret;
@@ -294,7 +294,7 @@ public:
 	{
 		std::vector<BasicType> temp;
 		in_stream& ret = this->operator>> (temp);
-		for (const auto &info:temp){
+		for (const auto& info : temp) {
 			a.emplace(info);
 		}
 
@@ -310,9 +310,9 @@ public:
 		this->operator>> (tempKey);
 		in_stream& ret = this->operator>> (tempVal);
 
-		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()){
+		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()) {
 			size_t key_size = tempKey.size();
-			for (size_t i = 0; i < key_size; ++i){
+			for (size_t i = 0; i < key_size; ++i) {
 				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));效率低
 				a.emplace(tempKey[i], tempVal[i]);
 			}
@@ -330,9 +330,9 @@ public:
 		this->operator>> (tempKey);
 		in_stream& ret = this->operator>> (tempVal);
 
-		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()){
+		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()) {
 			size_t key_size = tempKey.size();
-			for (size_t i = 0; i < key_size; ++i){
+			for (size_t i = 0; i < key_size; ++i) {
 				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));//会报错
 				a.emplace(tempKey[i], tempVal[i]);
 			}
