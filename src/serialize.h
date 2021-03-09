@@ -53,7 +53,7 @@ static std::string serialize(Type& b) \
 { \
         std::string ret; \
         ret.append((const char*)&b,sizeof(Type)); \
-        return ret; \
+        return std::move(ret); \
 }
 
 #define DEF_BASIC_TYPE_DESERIALIZE(Type)  \
@@ -87,13 +87,13 @@ DEF_BASIC_TYPE_SERIALIZE_AND_DESERIALIZE(double)
 
 // for c++ type std::string
 template<>
-static std::string serialize(std::string& s)
+static std::string serialize(const std::string& s)
 {
 	unsigned int len = static_cast<unsigned int>(s.size());
 	std::string ret;
 	ret.append(::serialize(len));
 	ret.append(s.data(), len);
-	return ret;
+	return std::move(ret);
 }
 
 template<>
@@ -183,8 +183,8 @@ public:
 		typename std::map<BasicTypeA, BasicTypeB>::const_iterator it = a.begin();
 		for (;it != a.end();++it)
 		{
-			tempKey.push_back(it->first);
-			tempVal.push_back(it->second);
+			tempKey.emplace_back(it->first);
+			tempVal.emplace_back(it->second);
 		}
 
 		this->operator<< (tempKey);
@@ -200,8 +200,8 @@ public:
 		typename std::unordered_map<BasicTypeA, BasicTypeB>::const_iterator it = a.begin();
 		for (;it != a.end();++it)
 		{
-			tempKey.push_back(it->first);
-			tempVal.push_back(it->second);
+			tempKey.emplace_back(it->first);
+			tempVal.emplace_back(it->second);
 		}
 
 		this->operator<< (tempKey);
@@ -245,7 +245,7 @@ public:
 			BasicType item;
 			int size = ::deserialize(str_, item);
 			str_ = str_.substr(size);
-			a.push_back(item);
+			a.emplace_back(item);
 		}
 
 		return *this;
@@ -313,7 +313,8 @@ public:
 		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()){
 			size_t key_size = tempKey.size();
 			for (size_t i = 0; i < key_size; ++i){
-				a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));
+				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));效率低
+				a.emplace(tempKey[i], tempVal[i]);
 			}
 		}
 
@@ -332,7 +333,7 @@ public:
 		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()){
 			size_t key_size = tempKey.size();
 			for (size_t i = 0; i < key_size; ++i){
-				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));
+				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));//会报错
 				a.emplace(tempKey[i], tempVal[i]);
 			}
 		}
