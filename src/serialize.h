@@ -134,8 +134,7 @@ public:
 		std::string x = ::serialize(len);
 		os_.write(x.data(), x.size());
 
-		for (unsigned int i = 0; i < len; ++i)
-		{
+		for (unsigned int i = 0; i < len; ++i) {
 			std::string item = ::serialize(a[i]);
 			os_.write(item.data(), item.size());
 		}
@@ -184,38 +183,77 @@ public:
 		return this->operator<< (temp);
 	}
 
+	template<typename BasicType>
+	out_stream& operator<< (std::unordered_multiset<BasicType>& a)
+	{
+		std::vector<BasicType> temp;
+		std::copy(a.begin(), a.end(), std::back_inserter(temp));
+		return this->operator<< (temp);
+	}
+
 	template<typename BasicTypeA, typename BasicTypeB>
 	out_stream& operator<< (std::map<BasicTypeA, BasicTypeB>& a)
 	{
-		std::vector<BasicTypeA> tempKey;
-		std::vector<BasicTypeB> tempVal;
+		std::vector<BasicTypeA> temp_key;
+		std::vector<BasicTypeB> temp_val;
 
-		typename std::map<BasicTypeA, BasicTypeB>::const_iterator it = a.begin();
-		for (;it != a.end();++it)
-		{
-			tempKey.emplace_back(it->first);
-			tempVal.emplace_back(it->second);
+		for (const auto& info : a) {
+			temp_key.emplace_back(info.first);
+			temp_val.emplace_back(info.second);
 		}
 
-		this->operator<< (tempKey);
-		return this->operator<< (tempVal);
+		//typename std::map<BasicTypeA, BasicTypeB>::const_iterator it = a.begin();
+		//for (;it != a.end();++it){
+		//	tempKey.emplace_back(it->first);
+		//	tempVal.emplace_back(it->second);
+		//}
+
+		this->operator<< (temp_key);
+		return this->operator<< (temp_val);
 	}
 
 	template<typename BasicTypeA, typename BasicTypeB>
 	out_stream& operator<< (std::unordered_map<BasicTypeA, BasicTypeB>& a)
 	{
-		std::vector<BasicTypeA> tempKey;
-		std::vector<BasicTypeB> tempVal;
+		std::vector<BasicTypeA> temp_key;
+		std::vector<BasicTypeB> temp_val;
 
-		typename std::unordered_map<BasicTypeA, BasicTypeB>::const_iterator it = a.begin();
-		for (;it != a.end();++it)
-		{
-			tempKey.emplace_back(it->first);
-			tempVal.emplace_back(it->second);
+		for (const auto& info : a) {
+			temp_key.emplace_back(info.first);
+			temp_val.emplace_back(info.second);
 		}
 
-		this->operator<< (tempKey);
-		return this->operator<< (tempVal);
+		//typename std::unordered_map<BasicTypeA, BasicTypeB>::const_iterator it = a.begin();
+		////auto it = a.begin();
+		//for (;it != a.end();++it){
+		//	tempKey.emplace_back(it->first);
+		//	tempVal.emplace_back(it->second);
+		//}
+
+		this->operator<< (temp_key);
+		return this->operator<< (temp_val);
+	}
+
+	template<typename BasicTypeA, typename BasicTypeB>
+	out_stream& operator<< (std::unordered_multimap<BasicTypeA, BasicTypeB>& a)
+	{
+		std::vector<BasicTypeA> temp_key;
+		std::vector<BasicTypeB> temp_val;
+
+		for (const auto& info : a) {
+			temp_key.emplace_back(info.first);
+			temp_val.emplace_back(info.second);
+		}
+
+		//typename std::unordered_map<BasicTypeA, BasicTypeB>::const_iterator it = a.begin();
+		////auto it = a.begin();
+		//for (;it != a.end();++it){
+		//	tempKey.emplace_back(it->first);
+		//	tempVal.emplace_back(it->second);
+		//}
+
+		this->operator<< (temp_key);
+		return this->operator<< (temp_val);
 	}
 
 	std::string str()
@@ -250,8 +288,7 @@ public:
 		int ret = ::deserialize(str_, len);
 		str_ = str_.substr(ret);
 
-		for (unsigned int i = 0; i < len; ++i)
-		{
+		for (unsigned int i = 0; i < len; ++i) {
 			BasicType item;
 			int size = ::deserialize(str_, item);
 			str_ = str_.substr(size);
@@ -266,8 +303,7 @@ public:
 	{
 		std::vector<BasicType> temp;
 		in_stream& ret = this->operator>> (temp);
-		if (temp.size() > 0)
-		{
+		if (temp.size() > 0) {
 			std::copy(temp.begin(), temp.end(), std::back_inserter(a));
 		}
 
@@ -280,8 +316,7 @@ public:
 	{
 		std::vector<BasicType> temp;
 		in_stream& ret = this->operator>> (temp);
-		if (temp.size() > 0)
-		{
+		if (temp.size() > 0) {
 			std::copy(temp.begin(), temp.end(), std::back_inserter(a));
 		}
 	}
@@ -291,8 +326,7 @@ public:
 	{
 		std::vector<BasicType> temp;
 		in_stream& ret = this->operator>> (temp);
-		if (temp.size() > 0)
-		{
+		if (temp.size() > 0) {
 			std::copy(temp.begin(), temp.end(), std::back_inserter(a));
 		}
 
@@ -312,11 +346,35 @@ public:
 	}
 
 	template<typename BasicType>
+	in_stream& operator>> (std::multiset<BasicType>& a)
+	{
+		std::vector<BasicType> temp;
+		in_stream& ret = this->operator>> (temp);
+		for (const auto& info : temp) {
+			a.emplace(info);
+		}
+
+		return ret;
+	}
+
+	template<typename BasicType>
 	in_stream& operator>> (std::unordered_set<BasicType>& a)
 	{
 		std::vector<BasicType> temp;
 		in_stream& ret = this->operator>> (temp);
-		for (const auto &info:temp){
+		for (const auto& info : temp) {
+			a.emplace(info);
+		}
+
+		return ret;
+	}
+
+	template<typename BasicType>
+	in_stream& operator>> (std::unordered_multiset<BasicType>& a)
+	{
+		std::vector<BasicType> temp;
+		in_stream& ret = this->operator>> (temp);
+		for (const auto& info : temp) {
 			a.emplace(info);
 		}
 
@@ -326,17 +384,37 @@ public:
 	template<typename BasicTypeA, typename BasicTypeB>
 	in_stream& operator>> (std::map<BasicTypeA, BasicTypeB>& a)
 	{
-		std::vector<BasicTypeA> tempKey;
-		std::vector<BasicTypeB> tempVal;
+		std::vector<BasicTypeA> temp_key;
+		std::vector<BasicTypeB> temp_val;
 
-		this->operator>> (tempKey);
-		in_stream& ret = this->operator>> (tempVal);
+		this->operator>> (temp_key);
+		in_stream& ret = this->operator>> (temp_val);
 
-		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()){
-			size_t key_size = tempKey.size();
-			for (size_t i = 0; i < key_size; ++i){
+		if (temp_key.size() > 0 && temp_val.size() == temp_key.size()) {
+			size_t key_size = temp_key.size();
+			for (size_t i = 0; i < key_size; ++i) {
 				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));效率低
-				a.emplace(tempKey[i], tempVal[i]);
+				a.emplace(temp_key[i], temp_val[i]);
+			}
+		}
+
+		return ret;
+	}
+
+	template<typename BasicTypeA, typename BasicTypeB>
+	in_stream& operator>> (std::multimap<BasicTypeA, BasicTypeB>& a)
+	{
+		std::vector<BasicTypeA> temp_key;
+		std::vector<BasicTypeB> temp_val;
+
+		this->operator>> (temp_key);
+		in_stream& ret = this->operator>> (temp_val);
+
+		if (temp_key.size() > 0 && temp_val.size() == temp_key.size()) {
+			size_t key_size = temp_key.size();
+			for (size_t i = 0; i < key_size; ++i) {
+				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));效率低
+				a.emplace(temp_key[i], temp_val[i]);
 			}
 		}
 
@@ -346,17 +424,37 @@ public:
 	template<typename BasicTypeA, typename BasicTypeB>
 	in_stream& operator>> (std::unordered_map<BasicTypeA, BasicTypeB>& a)
 	{
-		std::vector<BasicTypeA> tempKey;
-		std::vector<BasicTypeB> tempVal;
+		std::vector<BasicTypeA> temp_key;
+		std::vector<BasicTypeB> temp_val;
 
-		this->operator>> (tempKey);
-		in_stream& ret = this->operator>> (tempVal);
+		this->operator>> (temp_key);
+		in_stream& ret = this->operator>> (temp_val);
 
-		if (tempKey.size() > 0 && tempVal.size() == tempKey.size()){
-			size_t key_size = tempKey.size();
-			for (size_t i = 0; i < key_size; ++i){
+		if (temp_key.size() > 0 && temp_val.size() == temp_key.size()) {
+			size_t key_size = temp_key.size();
+			for (size_t i = 0; i < key_size; ++i) {
 				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));//会报错
-				a.emplace(tempKey[i], tempVal[i]);
+				a.emplace(temp_key[i], temp_val[i]);
+			}
+		}
+
+		return ret;
+	}
+
+	template<typename BasicTypeA, typename BasicTypeB>
+	in_stream& operator>> (std::unordered_multimap<BasicTypeA, BasicTypeB>& a)
+	{
+		std::vector<BasicTypeA> temp_key;
+		std::vector<BasicTypeB> temp_val;
+
+		this->operator>> (temp_key);
+		in_stream& ret = this->operator>> (temp_val);
+
+		if (temp_key.size() > 0 && temp_val.size() == temp_key.size()) {
+			size_t key_size = temp_key.size();
+			for (size_t i = 0; i < key_size; ++i) {
+				//a.insert(std::make_pair<BasicTypeA, BasicTypeB>(tempKey[i], tempVal[i]));//会报错
+				a.emplace(temp_key[i], temp_val[i]);
 			}
 		}
 
