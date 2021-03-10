@@ -38,6 +38,7 @@
 - （1）对基本数据类型char,short,int,long,string的序列化；
 - （2）支持序列化为socket流；
 - （3）支持对std::vector、std::deque、std::list、forward_list、std::set、std::multiset std::map std::unordered_map unordered_multimap std::unordered_set std::unordered_multiset的序列化;
+- (4)按照一个字节的对齐方式对齐
 
 ## 四、参考文献
 
