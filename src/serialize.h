@@ -7,7 +7,7 @@
 #include <map>     //std::map
 #include <utility>    // std::pair
 #include <iterator>  //std::back_inserter
-#include <string.h>  //memcpy
+#include <string>  //memcpy
 #include <forward_list>
 #include <unordered_map>
 #include <unordered_set>
@@ -117,6 +117,8 @@ public:
 	out_stream() : os_(std::ios::binary)
 	{
 	}
+
+	~out_stream() = default;
 
 	template<typename SerializableType>
 	out_stream& operator<< (SerializableType& a)
@@ -268,10 +270,11 @@ public:
 class in_stream
 {
 public:
-
 	in_stream(const std::string& s) : str_(s), total_(s.size())
 	{
 	}
+
+	~in_stream() = default;
 
 	template<typename SerializableType>
 	in_stream& operator>> (SerializableType& a)
