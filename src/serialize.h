@@ -16,7 +16,7 @@
 ////////////////////////////////////////////
 //Serialize for custom class object
 //If your class object want to be serialized,
-//Plese derive for this base class
+//Please derive for this base class
 ///////////////////////////////////////////
 
 class Serializable
@@ -114,8 +114,9 @@ static unsigned int deserialize(std::string& str, std::string& s)
 class out_stream
 {
 public:
-	out_stream() : os_(std::ios::binary)
+	out_stream() : os_(std::ios::binary | std::ios::out)
 	{
+
 	}
 
 	~out_stream() = default;
@@ -468,7 +469,6 @@ public:
 	{
 		return static_cast<unsigned int>(total_ - str_.size());
 	}
-
 protected:
 	std::string str_;
 	size_t total_;
